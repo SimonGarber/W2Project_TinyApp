@@ -13,6 +13,7 @@
    <ul>
     <% for(let shortUrl in urls){  %>
         <li><%= shortUrl %> - <%= urls[shortUrl]  %></li> <form method="POST" action="/urls/<%=shortUrl%>/delete"><button type="submit" class="btn btn-primary">Delete</button></form>
+        </li> <form method="GET" action="/urls/<%=shortUrl%>"><button type="submit" class="btn btn-primary">Edit</button></form>
     <% }; %>
 </ul> <!-- Add EJS code here -->
 </body>
