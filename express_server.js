@@ -8,7 +8,8 @@ for ( var i = 0; i < 6; i++ ) {
    }
    // console.log(result);
    return result;
-}
+};
+
 
 var express = require("express");
 var app = express();
@@ -71,4 +72,9 @@ app.post("/urls", (req, res) => {
   console.log(urlDatabase[shortened]);
   console.log(urlDatabase);
   res.redirect("/urls/"+shortened);         // Respond with 'Ok' (we will replace this)
+});
+
+app.post("/urls/:shortURL/delete",(req,res) => {
+  delete urlDatabase[req.params.shortURL]
+  res.redirect("/urls");
 });
