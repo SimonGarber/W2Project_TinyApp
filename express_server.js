@@ -107,3 +107,15 @@ app.post("/login",(req,res) =>{
   res.redirect("/"); 
 });
 
+app.post("/logout",(req,res) =>{
+  /**
+   * Reaction from the site after the user hits the logout button 
+   * the site will clear the cookie associated with the username and redirect them to the urls page
+   * 
+   *
+   */
+    
+   res.clearCookie("username")
+  res.redirect("/urls");
+  });
+

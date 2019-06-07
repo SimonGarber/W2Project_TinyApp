@@ -9,5 +9,8 @@
                         style="width: 150px; margin: 2em">
 </form>
 <% } else { %>
-        Hello <%= username %>
+        Logged in as: <%= username %>
+        <form method="POST" action="/logout">
+                 <button type="submit" class="btn btn-primary">Logout</button>
+        </form>
 <% } %>
