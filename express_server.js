@@ -1,4 +1,4 @@
-
+// Random ID Helper Function
 function generateRandomString() {
 var result = '';
 var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -20,12 +20,12 @@ var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
-
+// Global users object
 const users = {
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "metaphive11@gmail.com", 
-    password: "purple-monkey-dinosaur"
+  "test": {
+    id: "test", 
+    email: "hello@gmail.com", 
+    password: "1234"
   },
  "user2RandomID": {
     id: "user2RandomID", 
@@ -38,19 +38,33 @@ const users = {
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+// Helper Function for looking up emails
 function emailLookUp(email){
   for(i in users){
     if(users[i].email === email){
-    return email 
+    return users[i]; 
+    }
+    
+  }
+  return false;
+}
+// Helper Function for looking up passwords
+function passwordLookup(password){
+  for(i in users){
+    if(users[i].password === password){
+    return password 
     }
     
   }
   
 }
+
+
 // function is not passing the correct information or the helper function is not iterating properly, need to 
 // check to see what this function is doing and if it is scoped correctly
 app.get("/register", (req,res) => {
-  res.render("register")
+ 
+  res.render("urls_register")
 });
 
 
@@ -63,15 +77,22 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], 
-  user: users[req.cookies.user_id]
+  let templateVars = { 
+    shortURL: req.params.shortURL, 
+    longURL: urlDatabase[req.params.shortURL], 
+    user: users[req.cookies.user_id]
   };
   // console.log(templateVars)
   res.render("urls_show", templateVars);
 
 });
 
-// app.get("/urls/login",(req,res) =>
+ app.get("/login",(req,res) => {
+   
+  //  console.log(res.cookies.user_id);
+   let templateVars = {};
+   res.render("urls_login",templateVars)
+ });
 
 
 app.get("/urls", (req, res) => {
@@ -105,6 +126,12 @@ app.get("/u/:shortURL",(req,res) => {
   res.redirect(longURL);
 });
 
+app.get("/login",(req,res) => {
+ 
+  
+  res.render("login");
+})
+
 app.post("/urls", (req, res) => {
    // console.log(req.body);
   const shortened = generateRandomString()
@@ -126,15 +153,37 @@ res.redirect("/urls");
 
 });
 
-app.post("/login",(req,res) =>{
+app.post("/login",(req,res) => {
   /**
    * Reaction from the site after the user logs their login information and presses the button.
    * the site will log a cookie and redirect them to the urls page.
    * 
    */
-  const user_id = req.body.user_id
-  res.cookie("user_id",user_id)
-  res.redirect("/"); 
+  
+   if(!emailLookUp(req.body.email)){
+    res.status(403).send("you need to register an account")
+
+  
+
+    
+  }
+  else {
+    let user = emailLookUp(req.body.email)
+    console.log(user);
+    if(users[i].password === req.body.password){
+      res.cookie("user_id",user.id)
+    res.redirect("/urls");
+    }
+    else {
+      res.status(403).send("the password does not match!")
+    }
+
+  }
+  
+    
+  
+  
+  // res.redirect("/urls"); 
 });
 
 app.post("/logout",(req,res) =>{
@@ -159,13 +208,9 @@ app.post("/logout",(req,res) =>{
     } 
     if(req.body.email === emailLookUp(req.body.email)) {
       res.status(400).send("already exists")
+      // res.redirect("/register"); <---- doesn't do anything 
     
     }
-    
-    // for (email[users] in users){
-    // if(users.email === req.body.username) {
-    //   res.status(400).send("This email is already registered")
-    // }
     
   
     const newId = generateRandomString()
@@ -177,5 +222,6 @@ app.post("/logout",(req,res) =>{
     res.cookie("user_id",newId)
     res.redirect("/urls");
     console.log(req.body.password)
+    console.log(users)
   
   });
