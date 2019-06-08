@@ -60,8 +60,8 @@ function passwordLookup(password){
 }
 
 
-// function is not passing the correct information or the helper function is not iterating properly, need to 
-// check to see what this function is doing and if it is scoped correctly
+
+
 app.get("/register", (req,res) => {
  
   res.render("urls_register")
@@ -200,15 +200,15 @@ app.post("/logout",(req,res) =>{
 
   app.post("/register",(req,res) =>{
     if (!req.body.email){
-      res.status(400).send("Email is required")
+      res.status(400).send("Email is required").redirect("/register");
       // res.redirect("/register")
     }
     if(!req.body.password){
-      res.status(400).send("Password is required")
+      res.redirect("/register");
     } 
     if(req.body.email === emailLookUp(req.body.email)) {
-      res.status(400).send("already exists")
-      // res.redirect("/register"); <---- doesn't do anything 
+      res.redirect("/register");
+       
     
     }
     
