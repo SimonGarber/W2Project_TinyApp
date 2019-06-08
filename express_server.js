@@ -21,12 +21,42 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "metaphive11@gmail.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+function emailLookUp(email){
+  for(i in users){
+    if(users[i].email === email){
+    return email 
+    }
+    
+  }
+  
+}
+// function is not passing the correct information or the helper function is not iterating properly, need to 
+// check to see what this function is doing and if it is scoped correctly
+app.get("/register", (req,res) => {
+  res.render("register")
+});
+
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new",{
-    username:req.cookies.username
+    user:users[req.cookies.user_id]
   });
 
 });
@@ -34,7 +64,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], 
-  username: req.cookies.username
+  user: users[req.cookies.user_id]
   };
   // console.log(templateVars)
   res.render("urls_show", templateVars);
@@ -47,7 +77,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = { 
     urls: urlDatabase, 
-    username:req.cookies.username
+    user: users[req.cookies.user_id]
   };
   res.render("urls_index", templateVars);
 
@@ -102,8 +132,8 @@ app.post("/login",(req,res) =>{
    * the site will log a cookie and redirect them to the urls page.
    * 
    */
-  const username = req.body.username
-  res.cookie("username",username)
+  const user_id = req.body.user_id
+  res.cookie("user_id",user_id)
   res.redirect("/"); 
 });
 
@@ -115,7 +145,37 @@ app.post("/logout",(req,res) =>{
    *
    */
     
-   res.clearCookie("username")
+   res.clearCookie("user_id")
   res.redirect("/urls");
   });
 
+  app.post("/register",(req,res) =>{
+    if (!req.body.email){
+      res.status(400).send("Email is required")
+      // res.redirect("/register")
+    }
+    if(!req.body.password){
+      res.status(400).send("Password is required")
+    } 
+    if(req.body.email === emailLookUp(req.body.email)) {
+      res.status(400).send("already exists")
+    
+    }
+    
+    // for (email[users] in users){
+    // if(users.email === req.body.username) {
+    //   res.status(400).send("This email is already registered")
+    // }
+    
+  
+    const newId = generateRandomString()
+    users[newId] = {
+      id: newId,
+      email: req.body.email,
+      password: req.body.password,
+    }
+    res.cookie("user_id",newId)
+    res.redirect("/urls");
+    console.log(req.body.password)
+  
+  });

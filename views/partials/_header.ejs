@@ -1,15 +1,15 @@
 <h1> Tiny App </h1>
-<% if(!username){%>
+<% if(!user){%>
 
 <form method="POST" action="/login">
         <button type="submit" class="btn btn-primary">Login</button>
-        <div class="form-group mb-2"><label for="username">Enter Username:</label>
+        <div class="form-group mb-2"><label for="user_id">Enter Username:</label>
 
-                <input class="form-control" type="text" name="username" placeholder="Username"
+                <input class="form-control" type="text" name="user_id" placeholder="Username"
                         style="width: 150px; margin: 2em">
 </form>
 <% } else { %>
-        Logged in as: <%= username %>
+        Logged in as: <%= user.email %>
         <form method="POST" action="/logout">
                  <button type="submit" class="btn btn-primary">Logout</button>
         </form>

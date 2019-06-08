@@ -9,7 +9,7 @@
   <title>TinyApp</title>
 </head>
 <body style="font-size:20px; padding:50px;">
-  <%- include("./partials/_header", {username:username}) %>
+  <%- include("./partials/_header", {user: user}) %>
     <p><%=shortURL%><%=longURL%></p>
     <form class="form-inline" action="/urls/<%=shortURL%>/update" method="POST">
       <div class="form-group mb-2">

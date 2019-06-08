@@ -9,7 +9,7 @@
   <title>TinyApp</title>
 </head>
 <body style="font-size:20px; padding:50px;">
-    <%- include("./partials/_header", {username:username}) %>
+    <%- include("./partials/_header", {user: user}) %>
    <ul>
     <% for(let shortUrl in urls){  %>
         <li><%= shortUrl %> - <%= urls[shortUrl]  %></li> <form method="POST" action="/urls/<%=shortUrl%>/delete"><button type="submit" class="btn btn-primary">Delete</button></form>
