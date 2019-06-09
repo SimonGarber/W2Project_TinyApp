@@ -56,22 +56,32 @@ function passwordLookup(password){
     }
     
   }
-  
+  return false
 }
 
 
 
 
 app.get("/register", (req,res) => {
- 
-  res.render("urls_register")
+  let templateVars = {
+    urls:urlDatabase,
+    user:users[req.cookies.user_id]
+  };
+  res.render("urls_register",templateVars)
 });
 
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new",{
+  let templateVars = {
     user:users[req.cookies.user_id]
-  });
+  }
+    if(!req.cookies.user_id){ 
+      res.redirect("/login")
+    }
+  
+  res.render("urls_new",templateVars)
+    
+  
 
 });
 
@@ -87,12 +97,12 @@ app.get("/urls/:shortURL", (req, res) => {
 
 });
 
- app.get("/login",(req,res) => {
+//  app.get("/login",(req,res) => {
    
-  //  console.log(res.cookies.user_id);
-   let templateVars = {};
-   res.render("urls_login",templateVars)
- });
+//   //  console.log(res.cookies.user_id);
+//    let templateVars = {};
+//    res.render("urls_login",templateVars)
+//  });
 
 
 app.get("/urls", (req, res) => {
@@ -127,10 +137,12 @@ app.get("/u/:shortURL",(req,res) => {
 });
 
 app.get("/login",(req,res) => {
- 
-  
-  res.render("login");
-})
+  let templateVars = { 
+    
+    user: users[req.cookies.user_id]
+  };
+  res.render("urls_login",templateVars);
+});
 
 app.post("/urls", (req, res) => {
    // console.log(req.body);
@@ -168,11 +180,10 @@ app.post("/login",(req,res) => {
     
   }
   else {
-    let user = emailLookUp(req.body.email)
-    console.log(user);
+    const user = emailLookUp(req.body.email)
+    
     if(users[i].password === req.body.password){
-      res.cookie("user_id",user.id)
-    res.redirect("/urls");
+      return res.cookie("user_id",user.id).redirect("/urls");
     }
     else {
       res.status(403).send("the password does not match!")
@@ -199,6 +210,9 @@ app.post("/logout",(req,res) =>{
   });
 
   app.post("/register",(req,res) =>{
+
+    const user = emailLookUp(req.body.email)
+    
     if (!req.body.email){
       res.status(400).send("Email is required").redirect("/register");
       // res.redirect("/register")
@@ -206,11 +220,13 @@ app.post("/logout",(req,res) =>{
     if(!req.body.password){
       res.redirect("/register");
     } 
-    if(req.body.email === emailLookUp(req.body.email)) {
-      res.redirect("/register");
-       
+    if(req.body.email === user.email) {
+      res.status(400).redirect("/register");
+  
     
     }
+    else {
+    
     
   
     const newId = generateRandomString()
@@ -219,9 +235,11 @@ app.post("/logout",(req,res) =>{
       email: req.body.email,
       password: req.body.password,
     }
-    res.cookie("user_id",newId)
-    res.redirect("/urls");
-    console.log(req.body.password)
-    console.log(users)
   
-  });
+    return res.cookie("user_id",newId).redirect("/urls")
+    // res.redirect("/urls");
+    // console.log(req.body.password)
+    // console.log(users)
+  
+  };
+});
