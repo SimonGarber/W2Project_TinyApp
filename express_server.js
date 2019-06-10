@@ -1,20 +1,10 @@
-// Random ID Helper Function///////////
-function generateRandomString() {
-var result = '';
-var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-var charactersLength = characters.length;
-for ( var i = 0; i < 6; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
 
-   return result;
-};
-// ********************************************************
+const bcrypt = require('bcrypt');
+const express = require("express");
+const cookieParser = require('cookie-parser');
+const app = express();
+const PORT = 8080; // default port 8080
 
-var express = require("express");
-var cookieParser = require('cookie-parser');
-var app = express();
-var PORT = 8080; // default port 8080
 app.use(cookieParser());
 app.set("view engine", "ejs")
 
@@ -39,7 +29,7 @@ const users = {
   "userRandomID": {
     id: "userRandomID", 
     email: "hello@gmail.com", 
-    password: "1234"
+    password: "purplemonkeydinosaur"
   },
  "user2RandomID": {
     id: "user2RandomID", 
@@ -72,7 +62,18 @@ function passwordLookup(password){
   }
   return false
 }
-
+// Random ID Helper Function///////////
+function generateRandomString() {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < 6; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+     }
+  
+     return result;
+  };
+  // ********************************************************
 //******** Users register from this page with a unique email address that hasn't been previously registered***
 
 app.get("/register", (req,res) => {
@@ -100,7 +101,7 @@ app.get("/urls/new", (req, res) => {
 
 });
 
-// ****** URLs can be updated to point to new Long URLs*****************
+// ****** URLs can be updated to point to new Long URLs *****************
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
   
@@ -121,8 +122,7 @@ app.get("/urls", (req, res) => {
    user: users[key],
    urls: userUrls
   }
-  console.log(req.cookies.user_id)
-  console.log(urlsForUser(req.cookies.user_id))
+    
     res.render("urls_index", templateVars);
 });
 // ******* Home Page that redirects to URLs list**************
@@ -131,9 +131,7 @@ app.get("/",(req, res) => {
  res.redirect("/urls");
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
+
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -206,16 +204,16 @@ app.post("/login",(req,res) => {
   else {
     const user = emailLookUp(req.body.email)
     
-    if(users[i].password === req.body.password){
+    if(bcrypt.compareSync(req.body.password,user["password"])){ 
       return res.cookie("user_id",user.id).redirect("/urls");
     }
     else {
       res.status(403).send("the password does not match!")
     }
-
+    
   }
   
-    
+   
   
   
   // res.redirect("/urls"); 
@@ -251,17 +249,19 @@ app.post("/logout",(req,res) =>{
     }
     else {
     
-    
-  
-    const newId = generateRandomString()
+    let newId = generateRandomString()
     users[newId] = {
       id: newId,
       email: req.body.email,
-      password: req.body.password,
+      password: bcrypt.hashSync(req.body.password, 10)
     }
-    console.log(urlsForUser(req.cookies.user_id))
+    req.cookies.user_id = newId
     return res.cookie("user_id",newId).redirect("/urls")
-   
+   c
   
-  };
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
 });
