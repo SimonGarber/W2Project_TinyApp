@@ -1,4 +1,4 @@
-// Random ID Helper Function
+// Random ID Helper Function///////////
 function generateRandomString() {
 var result = '';
 var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -6,9 +6,10 @@ var charactersLength = characters.length;
 for ( var i = 0; i < 6; i++ ) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
    }
-   // console.log(result);
+
    return result;
 };
+// ********************************************************
 
 var express = require("express");
 var cookieParser = require('cookie-parser');
@@ -16,14 +17,27 @@ var app = express();
 var PORT = 8080; // default port 8080
 app.use(cookieParser());
 app.set("view engine", "ejs")
-var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
-// Global users object
+
+//************ Users Database for URLS********************
+const urlDatabase = {
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "userRandomID"},
+} 
+// ******** Helper function that lists URLs of the current logged in user*************
+function urlsForUser(id) {
+  let result = {}
+  for(key in urlDatabase){
+    if(urlDatabase[key]["userID"] === id){
+      result[key] = urlDatabase[key];
+    }
+  }
+  return result;
+}
+
+// *******Global users object*****************************
 const users = {
-  "test": {
-    id: "test", 
+  "userRandomID": {
+    id: "userRandomID", 
     email: "hello@gmail.com", 
     password: "1234"
   },
@@ -33,22 +47,22 @@ const users = {
     password: "dishwasher-funk"
   }
 }
-
+// ***********************************************************
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-// Helper Function for looking up emails
+
+// ***********Helper Function for looking up users with a given email address***********
 function emailLookUp(email){
   for(i in users){
     if(users[i].email === email){
     return users[i]; 
     }
-    
-  }
+    }
   return false;
-}
-// Helper Function for looking up passwords
+};
+// ********Helper Function for looking up passwords***********
 function passwordLookup(password){
   for(i in users){
     if(users[i].password === password){
@@ -59,63 +73,61 @@ function passwordLookup(password){
   return false
 }
 
-
-
+//******** Users register from this page with a unique email address that hasn't been previously registered***
 
 app.get("/register", (req,res) => {
   let templateVars = {
     urls:urlDatabase,
     user:users[req.cookies.user_id]
+    
   };
   res.render("urls_register",templateVars)
 });
 
+// ****** Only registered and logged in users can create Tiny URLs*********
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
+    urls: urlDatabase,
     user:users[req.cookies.user_id]
   }
-    if(!req.cookies.user_id){ 
+    if(!req.cookies.user_id){
+       
       res.redirect("/login")
     }
   
   res.render("urls_new",templateVars)
-    
-  
 
 });
 
-
+// ****** URLs can be updated to point to new Long URLs*****************
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
+  
     shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL], 
+    longURL: urlDatabase[req.params.shortURL]["longURL"], 
     user: users[req.cookies.user_id]
   };
-  // console.log(templateVars)
+  
   res.render("urls_show", templateVars);
 
 });
 
-//  app.get("/login",(req,res) => {
-   
-//   //  console.log(res.cookies.user_id);
-//    let templateVars = {};
-//    res.render("urls_login",templateVars)
-//  });
-
-
+// ******* List of User's URLS*************************
 app.get("/urls", (req, res) => {
-  let templateVars = { 
-    urls: urlDatabase, 
-    user: users[req.cookies.user_id]
-  };
-  res.render("urls_index", templateVars);
-
+  const key = req.cookies.user_id
+  const userUrls = urlsForUser(key);
+  const templateVars = { 
+   user: users[key],
+   urls: userUrls
+  }
+  console.log(req.cookies.user_id)
+  console.log(urlsForUser(req.cookies.user_id))
+    res.render("urls_index", templateVars);
 });
-
+// ******* Home Page that redirects to URLs list**************
 app.get("/",(req, res) => {
- console.log('Cookies: ', req.cookies)
+
  res.redirect("/urls");
 });
 
@@ -132,7 +144,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/u/:shortURL",(req,res) => {
-  const longURL = urlDatabase[req.params.shortURL]
+  const longURL = urlDatabase[req.params.shortURL]['longURL']
   res.redirect(longURL);
 });
 
@@ -145,12 +157,17 @@ app.get("/login",(req,res) => {
 });
 
 app.post("/urls", (req, res) => {
-   // console.log(req.body);
-  const shortened = generateRandomString()
-  urlDatabase[shortened] = req.body.longURL
-  // console.log(urlDatabase[shortened]);
-  // console.log(urlDatabase);
-  res.redirect("/urls/"+shortened);
+  if(req.cookies.user_id){
+    let shortURL = generateRandomString();
+  urlDatabase[shortURL] = {
+  url: req.body['longURL'],
+  userID: req.cookies.user_id,
+  
+};
+res.redirect("/urls/"+shortURL);
+  }
+  else
+    response.status(400);
 });
 
 app.post("/urls/:shortURL/delete",(req,res) => {
@@ -159,9 +176,16 @@ app.post("/urls/:shortURL/delete",(req,res) => {
 });
 
 app.post("/urls/:shortURL/update",(req,res) => {
-console.log(req.params, req.body)
-urlDatabase[req.params.shortURL] = req.body.longURL
+if (req.cookies.user_id === urlDatabase[req.params.shortURL]["userID"]){
+  urlDatabase[req.params.shortURL] = {
+    longURL: req.body.newURL,
+    userID: req.cookies.user_id
+  }
+  
+}
+
 res.redirect("/urls");
+
 
 });
 
@@ -235,11 +259,9 @@ app.post("/logout",(req,res) =>{
       email: req.body.email,
       password: req.body.password,
     }
-  
+    console.log(urlsForUser(req.cookies.user_id))
     return res.cookie("user_id",newId).redirect("/urls")
-    // res.redirect("/urls");
-    // console.log(req.body.password)
-    // console.log(users)
+   
   
   };
 });

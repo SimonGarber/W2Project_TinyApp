@@ -1,17 +1,14 @@
-<h1> Tiny App </h1>
+<center><h1> Tiny App </h1></center>
 <% if(!user){%>
-        <p><a href="/register"> Register </a>
-                <a href="/login"> Login </a>
-<!-- <form method="POST" action="/login">
-        <button type="submit" class="btn btn-primary">Login</button>
-        <div class="form-group mb-2"><label for="user_id">Enter Username:</label>
-
-                <input class="form-control" type="text" name="user_id" placeholder="Username"
-                        style="width: 150px; margin: 2em">
-</form> -->
+<center><a href="/register"><button type="button" class="btn btn-link">Register</button></a></center>   
+<center><a href="/login"><button type="button" class="btn btn-link">Login</button></a></center>
+                
+</form> 
 <% } else { %>
-        Logged in as: <%= user.email %>
-        <form method="POST" action="/logout">
-                 <button type="submit" class="btn btn-primary">Logout</button>
-        </form>
+   <center>Logged in as: <%= user.email %></center> 
+   <form method="POST" action="/logout">
+                <center><button type="submit" class="btn btn-link">logout</button></center>    
+        </form></center>
 <% } %>
+
+  

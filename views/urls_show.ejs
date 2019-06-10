@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <title>TinyApp</title>
-</head>
-<body style="font-size:20px; padding:50px;">
-  <%- include("./partials/_header", {user: user}) %>
-    <p><%=shortURL%><%=longURL%></p>
-    <form class="form-inline" action="/urls/<%=shortURL%>/update" method="POST">
-      <div class="form-group mb-2">
-        <label for="longURL">Edit your URL:</label>
-        <input class="form-control" type="text" name="longURL" placeholder="<%=longURL%>" style="width: 300px; margin: 1em">
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
-    </form>
-    <p><a href="<%=longURL%>"> this is a link </a>
-</body>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <title>TinyApp</title>
+  </head>
+
+  <body style="font-size:20px;">
+    <% include ./partials/_header %>
+    <% if(user){ %>
+   <center><button type="submit" class="btn btn-primary" style="margin: 20px;"><a style="text-decoration: none; color: white;" href="/urls/new">Create New TinyUrl</a></button></center>
+    <center><h3 style="margin: 14px;">Short URL: <%= shortURL %></h3></center>
+    <center><form class="device-width" method="POST" action="/urls/<%= shortURL %>" style="margin-left: 20px;">
+     <center> <label for="longURL">Enter New URL:</label></center>
+      <input class="form-control" type="text" name="longURL" value="<%= longURL %>" style="width: 300px; margin: 1em;">
+      <button type="submit" class="btn btn-secondary">Update</button>
+    </form></center>
+    <% }; %>
+  </body>
 </html>

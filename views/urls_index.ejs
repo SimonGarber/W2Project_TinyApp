@@ -3,17 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+  <%- include("./partials/_header", {users: user}) %>
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>TinyApp</title>
 </head>
 <body style="font-size:20px; padding:50px;">
-    <%- include("./partials/_header", {user: user}) %>
-   <ul>
-    <% for(let shortUrl in urls){  %>
-        <li><%= shortUrl %> - <%= urls[shortUrl]  %></li> <form method="POST" action="/urls/<%=shortUrl%>/delete"><button type="submit" class="btn btn-primary">Delete</button></form>
-        </li> <form method="GET" action="/urls/<%=shortUrl%>"><button type="submit" class="btn btn-primary">Edit</button></form>
-    <% }; %>
-</ul> <!-- Add EJS code here -->
+  <div style="max-width: 90%; margin: auto;">
+
+    <% if (user) { %>
+   <center> <button type="submit" class="btn btn-primary"><a style="text-decoration: none; color: white;" href="/urls/new">Create New TinyUrl</a></button></center>
+   <center> <table style="width: 80%; margin: 20px auto;">
+      <% for(key in urls) {%>
+        <tr>
+          <form method="POST" action="/urls/<%= key %>/delete">
+            <td><strong><%= key %>:</strong></td>
+            <td><a href="<%= urls[key]['longURL'] %>"><%= urls[key]['longURL'] %></a></td>
+            <td><button type="button" class="btn btn-secondary"><a style="text-decoration: none; color: white;" href="/urls/<%= key %>">Edit</a></button></td>
+            <td><button type="submit" value="DESTROY" class="btn btn-secondary">Delete</button></td>
+          </form>
+        <tr>
+      <% } %>
+    </table></center>
+    <% } else { %>
+    
+    <% } %>
+
+  </div>
+    
+
+    <!-- Add EJS code here -->
 </body>
+</html>
