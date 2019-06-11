@@ -105,12 +105,12 @@ app.get("/urls/new", (req, res) => {
 
 // ****** URLs can be updated to point to new Long URLs *****************
 app.get("/urls/:shortURL", (req, res) => {
-  console.log(req.params)
-  console.log(urlDatabase[req.params.shortURL])
+  // console.log(req.params)
+   console.log(urlDatabase[req.params.shortURL])
   let templateVars = { 
   
     shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL]["longURL"], 
+    longURL: urlDatabase[req.params.shortURL]["url"], 
     user: users[req.session.user_id]
   };
   
@@ -166,7 +166,7 @@ app.post("/urls", (req, res) => {
   userID: req.session.user_id,
   
 };
-res.redirect("/urls/"+shortURL);
+res.redirect("/urls");
   }
   else
     response.status(400);
@@ -199,23 +199,21 @@ app.post("/login",(req,res) => {
   
    if(!emailLookUp(req.body.email)){
     res.status(403).send("you need to register an account")
-
-  
-
-    
-  }
-  else {
-    const user = emailLookUp(req.body.email)
-    
+}
+  else { 
+     let user = emailLookUp(req.body.email)
+     console.log(user)
     if(bcrypt.compareSync(req.body.password,user["password"])){ 
-      return res.session("user_id",user.id).redirect("/urls");
-    }
+      req.session.user_id = user["id"]
+        res.redirect("/urls")
+    } 
+    
+    
     else {
       res.status(403).send("the password does not match!")
     }
     
   }
-  
    
   
   
@@ -252,14 +250,14 @@ app.post("/logout",(req,res) =>{
     }
     else {
     
-    let newId = generateRandomString()
+    const newId = generateRandomString()
     users[newId] = {
       id: newId,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10)
     }
     req.session.user_id = newId
-    console.log(users[newId])
+    // console.log(users[newId])
     return res.redirect("/urls")
    
   

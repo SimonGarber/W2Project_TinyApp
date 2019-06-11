@@ -18,7 +18,7 @@
         <tr>
           <form method="POST" action="/urls/<%= key %>/delete">
             <td><strong><%= key %>:</strong></td>
-            <td><a href="<%= urls[key]['longURL'] %>"><%= urls[key]['longURL'] %></a></td>
+            <td><a href="<%= urls[key]['longURL'] %>"></a><%= urls[key]['longURL'] %></a></td>
             <td><button type="button" class="btn btn-secondary"><a style="text-decoration: none; color: white;" href="/urls/<%= key %>">Edit</a></button></td>
             <td><button type="submit" value="DESTROY" class="btn btn-secondary">Delete</button></td>
           </form>
