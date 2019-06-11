@@ -106,11 +106,10 @@ app.get("/urls/new", (req, res) => {
 // ****** URLs can be updated to point to new Long URLs *****************
 app.get("/urls/:shortURL", (req, res) => {
   // console.log(req.params)
-   console.log(urlDatabase[req.params.shortURL])
+  //  console.log(urlDatabase[req.params.shortURL])
   let templateVars = { 
-  
+    longURL: urlDatabase[req.params.shortURL]["url"],
     shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL]["url"], 
     user: users[req.session.user_id]
   };
   
@@ -126,7 +125,7 @@ app.get("/urls", (req, res) => {
    user: users[key],
    urls: userUrls
   }
-    
+   
     res.render("urls_index", templateVars);
 });
 // ******* Home Page that redirects to URLs list**************
@@ -178,9 +177,9 @@ app.post("/urls/:shortURL/delete",(req,res) => {
 });
 
 app.post("/urls/:shortURL",(req,res) => {
-console.log(req.body)
+
   if (req.session.user_id === urlDatabase[req.params.shortURL]["userID"]){
-  urlDatabase[req.params.shortURL]['longURL'] = req.body.longURL
+  urlDatabase[req.params.shortURL]['url'] = req.body.longURL
   
   
 }
@@ -202,7 +201,7 @@ app.post("/login",(req,res) => {
 }
   else { 
      let user = emailLookUp(req.body.email)
-     console.log(user)
+    
     if(bcrypt.compareSync(req.body.password,user["password"])){ 
       req.session.user_id = user["id"]
         res.redirect("/urls")
@@ -257,7 +256,7 @@ app.post("/logout",(req,res) =>{
       password: bcrypt.hashSync(req.body.password, 10)
     }
     req.session.user_id = newId
-    // console.log(users[newId])
+    
     return res.redirect("/urls")
    
   
